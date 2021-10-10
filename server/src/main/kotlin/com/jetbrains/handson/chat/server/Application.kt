@@ -5,6 +5,7 @@ import io.ktor.http.cio.websocket.*
 import io.ktor.routing.*
 import io.ktor.util.Identity.decode
 import io.ktor.websocket.*
+import java.lang.Math.abs
 import java.util.*
 
 
@@ -27,6 +28,7 @@ fun Application.module() {
 
                 send("Available commands:")
                 send("show - to show solve history")
+                send("find eqNum - to show equation w/ index eqNum")
                 send("Enter polynomial's coeffs to start solving")
 
                 for (frame in incoming) {
@@ -41,6 +43,15 @@ fun Application.module() {
                             solvingHistory.forEachIndexed { index, equation ->
                                 send("${index+1}. ${equation.toString()} = 0, solution: x=${equation.solve()}")
                             }
+                        }
+                    }else if(params[0] == "find"){
+                        if(solvingHistory.isEmpty()){
+                            send("You can't use 'find' command because your solving history is empty!")
+                        }else if(kotlin.math.abs(params[1].toInt()) > solvingHistory.size || params[1].toInt() < 1){
+                            send("Please, enter a valid equation number!")
+                        }else{
+                            send("Selected equation: ${solvingHistory[params[1].toInt() - 1].toString()} = 0, solution: x=${solvingHistory[params[1].toInt() - 1].solve()}")
+
                         }
                     }else{
                         val intParams = params.map { it.toInt() }.toTypedArray()
@@ -61,6 +72,8 @@ fun Application.module() {
                 }
             } catch (e: Exception) {
                 println(e.localizedMessage)
+            }catch(e: NullPointerException){
+                println("Your command is incorrect!")
             } finally {
                 println("Removing $thisConnection!")
                 connections -= thisConnection
