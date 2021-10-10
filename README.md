@@ -1,7 +1,7 @@
-[![official JetBrains project](https://jb.gg/badges/official.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
-[![GitHub license](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0)
+# Equation solver
+Программа предназначена для решения уравнений вида 𝑎𝑎𝑛𝑛𝑥𝑥𝑛𝑛 + 𝑎𝑎𝑛𝑛−1𝑥𝑥𝑛𝑛−1 + ⋯ + 𝑎𝑎1𝑥𝑥 + 𝑎𝑎0 = 0\
+Пользователю предлагается ввести степень полинома, затем – ввести соответствующие коэффициенты.\
+Далее выполняется решение уравнения, вывод конечного уравнения и его решения(ий) в консоль.\
+Программа должна сохранять информацию о результатах вычислений и предоставлять возможность вывода
+этой информации по порядковому номеру, который присваивается решению по окончании вычислений.
 
-
-# Creating a Chat App with WebSockets
-
-This repository is the code corresponding to the hands-on lab [Creating a WebSocket Chat](https://ktor.io/docs/creating-web-socket-chat.html). 
