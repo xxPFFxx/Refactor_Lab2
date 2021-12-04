@@ -37,7 +37,7 @@ fun main() {
         install(WebSockets)
     }
     runBlocking {
-        client.webSocket(method = HttpMethod.Get, host = "127.0.0.1", port = 8080, path = "/chat") {
+        client.webSocket(method = HttpMethod.Get, host = "127.0.0.1", port = 8080, path = "/solver") {
             val messageOutputRoutine = launch { outputMessages() }
             val userInputRoutine = launch { inputMessages() }
 
