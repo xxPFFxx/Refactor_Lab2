@@ -96,13 +96,22 @@ fun Application.module() {
 
                     }
                     else if(params[0] == "show"){
-                        if(solvingHistory.isEmpty()){
-                            send("You have no saved equations here :(")
-                        }else {
-                            solvingHistory.forEachIndexed { index, equation ->
-                                send("${index+1}. ${equation.toString()} = 0, solution: x=${equation.solve()}")
+
+                        if (thisConnection.registered) {
+                            val currentUser = findUserByUsername(thisConnection.name)
+                            val userEquations = transaction { currentUser!!.equations .toList()}
+
+                            if(userEquations.isEmpty()){
+                                send("You have no saved equations here :(")
+                            }else {
+                                userEquations.forEachIndexed { index, equation ->
+                                    val currentEquation = transaction { equation.equation }
+                                    val currentSolution = transaction { equation.solution }
+                                    send("${index+1}. $currentEquation = 0, solution: x=${currentSolution}")
+                                }
                             }
                         }
+
                     }else if(params[0] == "find"){
                         if(solvingHistory.isEmpty()){
                             send("You can't use 'find' command because your solving history is empty!")

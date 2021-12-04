@@ -13,6 +13,7 @@ class User(id: EntityID<Int>) : IntEntity(id) {
     var name     by Users.name
     var password by Users.password
     var maxEquationNumber by Users.maxEquationNumber
+    val equations by Equation referrersOn Equations.user
 }
 
 object Users: IntIdTable() {
