@@ -12,15 +12,17 @@ class User(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<User>(Users)
     var name     by Users.name
     var password by Users.password
+    var maxEquationNumber by Users.maxEquationNumber
 }
 
 object Users: IntIdTable() {
     val name = varchar("name", 50);
     val password = varchar("password", 200);
+    val maxEquationNumber = integer("maxEquationNumber");
 }
 
 fun findUserByUsername(username : String) =
     transaction {
-        User.find { Users.name eq username }
+        User.find { Users.name eq username }.firstOrNull()
     }
 

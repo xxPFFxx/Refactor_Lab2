@@ -42,9 +42,8 @@ fun Application.module() {
                     val receivedText = frame.readText()
                     val params = receivedText.split(" ").toTypedArray()
                     if (params[0] == "register"){
-                        val users = findUserByUsername(params[1]);
-                        val userRegistered = transaction { !users.empty() }
-                        if (userRegistered){
+                        val user = findUserByUsername(params[1]);
+                        if (user != null){
                             send("User with that username already exists")
                             send("Available commands:")
                             send("register LOGIN PASSWORD - to register into system")
@@ -54,9 +53,10 @@ fun Application.module() {
                             transaction {
                                 addLogger(StdOutSqlLogger)
 
-                                Users.insert {
-                                    it[name] = params[1]
-                                    it[password] = BCrypt.hashpw(params[2], BCrypt.gensalt())
+                                val user = User.new{
+                                    name = params[1]
+                                    password = BCrypt.hashpw(params[2], BCrypt.gensalt())
+                                    maxEquationNumber = 0
                                 }
                             }
                             send("You successfully registered")
@@ -67,18 +67,19 @@ fun Application.module() {
 
                     }
                     else if (params[0] == "login"){
-                        val users = findUserByUsername(params[1]);
-                        val userRegistered = transaction { !users.empty() }
-
-                        if (!userRegistered){
+                        val user = findUserByUsername(params[1]);
+                        // TODO как-то запомнить в сессию id пользователя
+                        if (user == null){
                             send("No user with that username")
                             send("Available commands:")
                             send("register LOGIN PASSWORD - to register into system")
                             send("login LOGIN PASSWORD - to login into system")
                         }
                         else {
-                            val password = transaction { users.toList()[0].password };
+                            val password = transaction { user.password };
                             if (BCrypt.checkpw(params[2], password)) {
+                                thisConnection.name = params[1];
+                                thisConnection.registered = true
                                 send("You are logged in")
                                 send("Available commands:")
                                 send("show - to show solve history")
@@ -114,8 +115,20 @@ fun Application.module() {
                     }else{
                         val intParams = params.map { it.toInt() }.toTypedArray()
                         val p1 = Polynomial(intParams)
-
                         solvingHistory += p1
+                        val currentUser = findUserByUsername(thisConnection.name)
+                        currentUser?. let {
+                            transaction {
+                            currentUser.maxEquationNumber += 1
+                            Equation.new {
+                                number = currentUser.maxEquationNumber
+                                equation = "Введённый полином: ${p1.toString()} = 0"
+                                solution = "Решение: x=${p1.solve()}"
+                                user = currentUser
+                            }
+                            }
+                        }
+
 
                         val strPolynom = "Введённый полином: ${p1.toString()} = 0"
                         val solutions = "Решение: x=${p1.solve()}"

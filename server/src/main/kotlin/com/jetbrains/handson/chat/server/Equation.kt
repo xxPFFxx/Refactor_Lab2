@@ -26,3 +26,8 @@ fun findEquationByNumber(number : Int) =
     transaction {
         Equations.select{ Equations.number eq number}
     }
+
+fun findMaxEquationNumberForUser(username : String) =
+    transaction {
+
+    }
