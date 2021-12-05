@@ -21,13 +21,3 @@ object Equations: IntIdTable() {
     val solution = varchar("solution", 200);
     val user = reference("user", Users);
 }
-
-fun findEquationByNumber(number : Int) =
-    transaction {
-        Equations.select{ Equations.number eq number}
-    }
-
-fun findMaxEquationNumberForUser(username : String) =
-    transaction {
-
-    }

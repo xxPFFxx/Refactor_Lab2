@@ -8,6 +8,5 @@ class Connection(val session: DefaultWebSocketSession) {
         var lastId = AtomicInteger(0)
     }
     var name = ""
-    var id = 0
     var registered = false
 }

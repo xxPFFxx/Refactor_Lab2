@@ -17,7 +17,7 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 fun Application.module() {
     install(WebSockets)
     Database.connect("jdbc:postgresql://localhost:5432/postgres", driver = "org.postgresql.Driver",
-        user = "postgres", password = "gfhjkm2000")
+        user = "", password = "")
     transaction {     SchemaUtils.create (Users)
     SchemaUtils.create(Equations)}
     routing {
@@ -43,8 +43,6 @@ fun Application.module() {
                         }
                     }
                 }
-            }catch (e : NumberFormatException){
-                thisConnection.session.send("Bad format of coeffs, the all should be integer values, separated with space (1 2 3)")
             }
             catch (e: Exception) {
                 println(e.localizedMessage)

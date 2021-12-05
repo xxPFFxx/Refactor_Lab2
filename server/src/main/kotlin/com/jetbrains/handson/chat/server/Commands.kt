@@ -7,6 +7,11 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
 
 suspend fun registerCommand(params : Array<String>, thisConnection: Connection){
+    if (params.size != 3) {
+        thisConnection.session.send("Bad format of register command, example: register pff 123")
+        sendAvailableCommandsNotLoggedIn(thisConnection)
+        return
+    }
     val user = findUserByUsername(params[1]);
     if (user != null){
         thisConnection.session.send("User with that username already exists")
@@ -27,6 +32,11 @@ suspend fun registerCommand(params : Array<String>, thisConnection: Connection){
 }
 
 suspend fun loginCommand(params : Array<String>, thisConnection: Connection){
+    if (params.size != 3){
+        thisConnection.session.send("Bad format of login command, example: login pff 123")
+        sendAvailableCommandsNotLoggedIn(thisConnection)
+        return
+    }
     val user = findUserByUsername(params[1]);
     if (user == null){
         thisConnection.session.send("No user with that username")
@@ -92,7 +102,14 @@ suspend fun findCommand(params: Array<String>, thisConnection: Connection){
 
 suspend fun solveCommand(params: Array<String>, thisConnection: Connection) {
     if (thisConnection.registered) {
-        val intParams = params.map { it.toInt() }.toTypedArray()
+        val intParams = params.map {
+            if (!isNumeric(it)){
+                thisConnection.session.send("Bad format of coeffs, the all should be integer values, separated with space (1 2 3)")
+                sendAvailableCommandsLoggedIn(thisConnection)
+                return
+            }
+            it.toInt()
+        }.toTypedArray()
         val p1 = Polynomial(intParams)
         val currentUser = findUserByUsername(thisConnection.name)
         currentUser?.let {
@@ -114,3 +131,8 @@ suspend fun solveCommand(params: Array<String>, thisConnection: Connection) {
         sendAvailableCommandsNotLoggedIn(thisConnection)
     }
 }
+
+fun isNumeric(str: String): Boolean = str
+    .removePrefix("-")
+    .removePrefix("+")
+    .all { it in '0'..'9' }
